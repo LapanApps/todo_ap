@@ -17,10 +17,19 @@ class _HomeState extends State<Home> {
         title: Text("My TODO App"),
       ),
       body: ListView.builder(
+        itemCount: itemsTodo.length,
         itemBuilder: (context, index) {
           return ListTile(
-            title: Text("hello"),
-            subtitle: Text("subtitle"),
+            tileColor: Colors.red.shade100,
+            title: Text(itemsTodo[index]),
+            trailing: IconButton(
+              onPressed: () {
+                setState(() {
+                  itemsTodo.remove(itemsTodo[index]);
+                });
+              },
+              icon: Icon(Icons.delete),
+            ),
           );
         },
       ),
@@ -39,9 +48,13 @@ class _HomeState extends State<Home> {
                     TextButton(
                       onPressed: () {
                         // Add item to the todo items
-                        itemsTodo.add(_controller.text);
+                        // and notify UI
+                        setState(() {
+                          itemsTodo.add(_controller.text);
+                        });
 
-                        print(itemsTodo);
+                        // close the dialog
+                        Navigator.pop(context);
                       },
                       child: Text("Save"),
                     ),
