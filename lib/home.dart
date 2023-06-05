@@ -14,21 +14,32 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("My TODO App"),
+        title: const Text("My TODO App"),
       ),
       body: ListView.builder(
         itemCount: itemsTodo.length,
         itemBuilder: (context, index) {
-          return ListTile(
-            tileColor: Colors.red.shade100,
-            title: Text(itemsTodo[index]),
-            trailing: IconButton(
-              onPressed: () {
-                setState(() {
-                  itemsTodo.remove(itemsTodo[index]);
-                });
-              },
-              icon: Icon(Icons.delete),
+          return Card(
+            margin: const EdgeInsets.all(4),
+            // some choices
+            // ContinousRectangeBorder
+            // CircleBorder
+            // StarBorder
+            // StadiumBorder
+            shape: BeveledRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: ListTile(
+              // tileColor: Colors.red.shade100,
+              title: Text(itemsTodo[index]),
+              trailing: IconButton(
+                onPressed: () {
+                  setState(() {
+                    itemsTodo.remove(itemsTodo[index]);
+                  });
+                },
+                icon: const Icon(Icons.delete),
+              ),
             ),
           );
         },
@@ -40,9 +51,16 @@ class _HomeState extends State<Home> {
               builder: (context) {
                 TextEditingController _controller = TextEditingController();
                 return AlertDialog(
-                  title: Text("Add a todo"),
+                  title: const Text("Add a todo"),
                   content: TextField(
                     controller: _controller,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      hintText: "eg: Walk the cat",
+                      labelText: "Todo item",
+                    ),
                   ),
                   actions: [
                     TextButton(
@@ -56,13 +74,13 @@ class _HomeState extends State<Home> {
                         // close the dialog
                         Navigator.pop(context);
                       },
-                      child: Text("Save"),
+                      child: const Text("Save"),
                     ),
                   ],
                 );
               });
         },
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
     );
   }
