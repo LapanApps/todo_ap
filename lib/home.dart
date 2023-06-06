@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class Home extends StatefulWidget {
@@ -8,7 +9,16 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  List<String> itemsTodo = [];
+  final db = FirebaseFirestore.instance;
+  late CollectionReference collectionReference;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // point to our collection name in Firebase Console
+    collectionReference = db.collection("my todos");
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,44 +26,75 @@ class _HomeState extends State<Home> {
       appBar: AppBar(
         title: const Text("My TODO App"),
       ),
-      body: ListView.builder(
-        itemCount: itemsTodo.length,
-        itemBuilder: (context, index) {
-          return Card(
-            margin: const EdgeInsets.all(4),
-            // some choices
-            // ContinousRectangeBorder
-            // CircleBorder
-            // StarBorder
-            // StadiumBorder
-            shape: BeveledRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: ListTile(
-              // tileColor: Colors.red.shade100,
-              title: Text(itemsTodo[index]),
-              trailing: IconButton(
-                onPressed: () {
-                  setState(() {
-                    itemsTodo.remove(itemsTodo[index]);
-                  });
-                },
-                icon: const Icon(Icons.delete),
-              ),
-            ),
-          );
-        },
-      ),
+      body: StreamBuilder(
+          // get all the documents (all the todo items)
+          stream: collectionReference.snapshots(),
+          builder: (context, AsyncSnapshot<QuerySnapshot<Object?>> snapshot) {
+            if (!snapshot.hasData) {
+              // if data on laoded yet, display a loading indicator
+              return const LinearProgressIndicator();
+            }
+
+            var documents = snapshot.data as QuerySnapshot;
+
+            // Actually get all the todo items
+            var todoItems = documents.docs;
+
+            // sort the items so that the latest todo item is at the bottom
+            todoItems.sort((a, b) {
+              var aDateTime = a["dateTime"] as Timestamp;
+              var bDateTime = b["dateTime"] as Timestamp;
+              return aDateTime.compareTo(bDateTime);
+            });
+
+            return ListView.builder(
+              itemCount: todoItems.length,
+              itemBuilder: (context, index) {
+                // Extract the title and dateTime from the todo item
+                // by its index.
+                // The todoItems is just a Map (or key value pair)
+                // so to access it just give it a key
+                var todoTitle = todoItems[index]["title"];
+                var todoDateTime = todoItems[index]["dateTime"] as Timestamp;
+                return Card(
+                  margin: const EdgeInsets.all(4),
+                  // some choices
+                  // ContinousRectangeBorder
+                  // CircleBorder
+                  // StarBorder
+                  // StadiumBorder
+                  shape: BeveledRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: ListTile(
+                    title: Text(todoTitle),
+                    subtitle: Text(todoDateTime.toDate().toString()),
+                    trailing: IconButton(
+                      onPressed: () {
+                        // delete the todo item from firestore
+                        setState(() {
+                          collectionReference.doc(todoItems[index].id).delete();
+                        });
+                      },
+                      tooltip: "Delete todo item",
+                      icon: const Icon(Icons.delete),
+                    ),
+                  ),
+                );
+              },
+            );
+          }),
       floatingActionButton: FloatingActionButton(
+        tooltip: "Add a todo",
         onPressed: () {
           showDialog(
               context: context,
               builder: (context) {
-                TextEditingController _controller = TextEditingController();
+                TextEditingController controller = TextEditingController();
                 return AlertDialog(
                   title: const Text("Add a todo"),
                   content: TextField(
-                    controller: _controller,
+                    controller: controller,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -64,12 +105,20 @@ class _HomeState extends State<Home> {
                   ),
                   actions: [
                     TextButton(
-                      onPressed: () {
-                        // Add item to the todo items
-                        // and notify UI
-                        setState(() {
-                          itemsTodo.add(_controller.text);
+                      onPressed: () async {
+                        // ignore if empty
+                        if (controller.text.isEmpty) {
+                          return;
+                        }
+
+                        // add to firestore document
+                        collectionReference.doc().set({
+                          "title": controller.text,
+                          "dateTime": DateTime.now()
                         });
+
+                        // notify UI to refresh
+                        setState(() {});
 
                         // close the dialog
                         Navigator.pop(context);
