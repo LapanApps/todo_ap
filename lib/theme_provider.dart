@@ -9,6 +9,8 @@ class ThemeProvider extends ChangeNotifier {
 
   set isDarkMode(bool value) {
     _isDarkMode = value;
+
+    // notify UIs to build based on the new value
     notifyListeners();
   }
 }

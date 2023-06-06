@@ -19,7 +19,9 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // declaring the provider
     return ChangeNotifierProvider(
+      // see implementation in theme_provider.dart file
       create: (_) => ThemeProvider(),
       child: Consumer<ThemeProvider>(
         builder: (context, ThemeProvider themeSetting, _) {

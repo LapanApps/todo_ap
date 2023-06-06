@@ -36,6 +36,7 @@ class _HomeState extends State<Home> {
                 }),
           ],
         ),
+        // StreamBuilder is a widget that builds itself based on the latest snapshot of interaction with a stream.
         body: StreamBuilder(
             // get all the documents (all the todo items)
             stream: collectionReference.snapshots(),
