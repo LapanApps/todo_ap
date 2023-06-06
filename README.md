@@ -2,12 +2,13 @@
 
 A simple TODO app with Firebase Firestore as database & backend.
 
+https://github.com/LapanApps/todo_ap/assets/60868965/c4e17104-a0fb-4dd9-9411-86d55e3286bc
+
 ## Features
 
-- Data saved to Firebase Firestore
-- Data fetched from Firebase Firestore
+- Data synced to Firebase Firestore
 - Simple input validation: The data will not be updated if user give an empty value
-- Theme is based on your device (`ThemeMode.system`)
+- Switch to change theme
 
 ## Getting Started
 
@@ -19,4 +20,16 @@ A simple TODO app with Firebase Firestore as database & backend.
 
 ## Deploying
 
-You can deploy the Flutter web app to Firebase Hosting. Tutorial here: https://levelup.gitconnected.com/how-to-host-your-flutter-web-app-with-firebase-hosting-67d3e4657002
+https://todo-flutter-ukm.web.app/#/
+
+You can deploy the Flutter web app to Firebase Hosting. Steps:
+
+- Within the Flutter project, run `flutter build web` to build the web app
+- Run `firebase init`. Make sure you already install the Firebase CLI: https://firebase.google.com/docs/cli
+- `Are you ready to proceed? (Y/n)` - `Y`
+- `Which Firebase CLI features do you want to set up for this folder? Press Space to select features, then Enter to confirm your choices.` - Select `Hosting: Configure and deploy Firebase Hosting sites` - Enter
+- Select your Firebase project
+- `What do you want to use as your public directory? (public)` - `build/web`
+- `Configure as a single-page app (rewrite all urls to /index.html)? (y/N)` - `N`
+- `Set up automatic builds and deploys with GitHub? (y/N)` - `N`
+- Run `firebase deploy`
